@@ -78,18 +78,7 @@ export class InnerSlider extends React.Component {
     });
     if (this.props.lazyLoad === "progressive") {
       this.lazyLoadTimer = setInterval(this.progressiveLazyLoad, 1000);
-    }
-    this.ro = new ResizeObserver(() => {
-      if (this.state.animating) {
-        this.onWindowResized(false); // don't set trackStyle hence don't break animation
-        this.callbackTimers.push(
-          setTimeout(() => this.onWindowResized(), this.props.speed)
-        );
-      } else {
-        this.onWindowResized();
-      }
-    });
-    this.ro.observe(this.list);
+    }   
     Array.prototype.forEach.call(
       document.querySelectorAll(".slick-slide"),
       slide => {
@@ -101,6 +90,17 @@ export class InnerSlider extends React.Component {
     if (!window) {
       return;
     }
+    this.ro = new ResizeObserver(() => window.requestAnimationFrame(() => {
+      if (this.state.animating) {
+        this.onWindowResized(false); // don't set trackStyle hence don't break animation
+        this.callbackTimers.push(
+          setTimeout(() => this.onWindowResized(), this.props.speed)
+        );
+      } else {
+        this.onWindowResized();
+      }
+    }));
+    this.ro.observe(this.list);
     if (window.addEventListener) {
       window.addEventListener("resize", this.onWindowResized);
     } else {
